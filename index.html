@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SMKAHMY APP PREMIUM</title>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<!-- AXIOS -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#3b82f6);
+color:white;
+overflow:hidden;
+}
+
+.screen{
+display:none;
+height:100vh;
+overflow-y:auto;
+padding:20px;
+}
+
+.active{
+display:block;
+}
+
+.container{
+max-width:420px;
+margin:auto;
+margin-top:20px;
+background:rgba(255,255,255,0.15);
+padding:25px;
+border-radius:20px;
+backdrop-filter:blur(10px);
+}
+
+input,select,textarea,button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+}
+
+button{
+background:white;
+color:#2563eb;
+font-weight:bold;
+cursor:pointer;
+}
+
+.food-card{
+background:rgba(255,255,255,0.2);
+padding:15px;
+border-radius:15px;
+margin-top:10px;
+}
+
+img{
+width:100%;
+border-radius:15px;
+}
+
+iframe{
+width:100%;
+height:250px;
+border:none;
+border-radius:15px;
+}
+
+.success{
+margin-top:10px;
+font-weight:bold;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="loginScreen">
+
+<div class="container">
+
+<h2>🏫 LOGIN SEKOLAH</h2>
+
+<select id="type">
+<option value="pelawat">Pelawat</option>
+<option value="pengetua">Pengetua</option>
+</select>
+
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+
+<button onclick="login()">LOGIN</button>
+
+<div class="food-card">
+<p>Pelawat password: <b>pelawat</b></p>
+<p>Pengetua: <b>rizq / ehamad / alif</b></p>
+<p>Password: <b>pengetua</b></p>
+</div>
+
+</div>
+</div>
+
+<!-- MENU -->
+<div class="screen" id="menuScreen">
+
+<div class="container">
+
+<h2>📱 MENU SEKOLAH</h2>
+
+<button onclick="show('visitorScreen')">📋 Daftar Pelawat</button>
+
+<button onclick="show('foodScreen')">🍔 Order Makanan</button>
+
+<button onclick="show('aiScreen')">🤖 AI Sekolah</button>
+
+<button onclick="show('mapScreen')">🗺️ Peta Sekolah</button>
+
+<button onclick="show('uploadScreen')">📷 Upload Gambar</button>
+
+<button onclick="show('weatherScreen')">🌦️ Cuaca</button>
+
+<button onclick="logout()">🚪 Logout</button>
+
+</div>
+</div>
+
+<!-- VISITOR -->
+<div class="screen" id="visitorScreen">
+
+<div class="container">
+
+<h2>📋 DAFTAR PELAWAT</h2>
+
+<input id="visitorName" placeholder="Nama Pelawat">
+
+<input id="visitorReason" placeholder="Tujuan">
+
+<input type="time" id="visitorTime">
+
+<textarea id="visitorNote" placeholder="Catatan"></textarea>
+
+<button onclick="submitVisitor()">Hantar</button>
+
+<div id="visitorResult" class="success"></div>
+
+<button onclick="show('menuScreen')">⬅ Kembali</button>
+
+</div>
+</div>
+
+<!-- FOOD -->
+<div class="screen" id="foodScreen">
+
+<div class="container">
+
+<h2>🍔 MAKANAN KANTIN</h2>
+
+<div class="food-card">
+<h3>Nasi Lemak</h3>
+<button onclick="order('Nasi Lemak')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Nasi Goreng</h3>
+<button onclick="order('Nasi Goreng')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Mee Goreng</h3>
+<button onclick="order('Mee Goreng')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Bihun Goreng</h3>
+<button onclick="order('Bihun Goreng')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Chicken Chop</h3>
+<button onclick="order('Chicken Chop')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Burger Ayam</h3>
+<button onclick="order('Burger Ayam')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Hotdog</h3>
+<button onclick="order('Hotdog')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Nugget</h3>
+<button onclick="order('Nugget')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Teh Ais</h3>
+<button onclick="order('Teh Ais')">Order</button>
+</div>
+
+<div class="food-card">
+<h3>Milo Ais</h3>
+<button onclick="order('Milo Ais')">Order</button>
+</div>
+
+<!-- QR -->
+<div class="food-card">
+<h3>💳 QR PAYMENT</h3>
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=SMKAHMY-KANTIN">
+
+<p>Scan untuk bayar</p>
+</div>
+
+<div id="orderResult" class="success"></div>
+
+<button onclick="show('menuScreen')">⬅ Kembali</button>
+
+</div>
+</div>
+
+<!-- AI -->
+<div class="screen" id="aiScreen">
+
+<div class="container">
+
+<h2>🤖 AI SEKOLAH</h2>
+
+<input id="q" placeholder="Tanya AI...">
+
+<button onclick="ai()">Tanya</button>
+
+<div class="food-card">
+<p id="ans"></p>
+</div>
+
+<button onclick="show('menuScreen')">⬅ Kembali</button>
+
+</div>
+</div>
+
+<!-- MAP -->
+<div class="screen" id="mapScreen">
+
+<div class="container">
+
+<h2>🗺️ PETA SEKOLAH</h2>
+
+<iframe src="https://maps.google.com/maps?q=Lot%2019429%20Batu%203%20Jalan%20Bakri%20Muar&t=&z=15&output=embed"></iframe>
+
+<button onclick="show('menuScreen')">⬅ Kembali</button>
+
+</div>
+</div>
+
+<!-- UPLOAD -->
+<div class="screen" id="uploadScreen">
+
+<div class="container">
+
+<h2>📷 UPLOAD GAMBAR</h2>
+
+<input type="file" onchange="preview(event)">
+
+<img id="img" style="display:none;margin-top:10px;">
+
+<button onclick="show('menuScreen')">⬅ Kembali</button>
+
+</div>
+</div>
+
+<!-- WEATHER -->
+<div class="screen" id="weatherScreen">
+
+<div class="container">
+
+<h2>🌦️ CUACA</h2>
+
+<div class="food-card">
+<p>☀️ Cerah</p>
+<p>🌡️ 31°C</p>
+<p>💧 Kelembapan: 78%</p>
+<p>💨 Angin: 15km/h</p>
+<p>☔ Hujan: 40%</p>
+</div>
+
+<button onclick="show('menuScreen')">⬅ Kembali</button>
+
+</div>
+</div>
+
+<!-- ADMIN -->
+<div class="screen" id="adminScreen">
+
+<div class="container">
+
+<h2>👨‍💼 ADMIN PANEL</h2>
+
+<div class="food-card">
+<h3>👥 Jumlah Pelawat</h3>
+<div id="visitorList">Tiada pelawat</div>
+</div>
+
+<div class="food-card">
+<h3>📦 Order Masuk</h3>
+<div id="orderList">Tiada order</div>
+</div>
+
+<div class="food-card">
+<h3>🚌 Bas Sekolah</h3>
+<p>6:30 pagi / 2:30 petang</p>
+</div>
+
+<div class="food-card">
+<h3>📊 Status Sistem</h3>
+<p>✅ Online</p>
+</div>
+
+<button onclick="logout()">🚪 Logout</button>
+
+</div>
+</div>
+
+<script>
+
+/* FIREBASE CONFIG */
+const firebaseConfig = {
+
+apiKey: "MASUKKAN_API_KEY",
+
+authDomain: "app-sekolah.firebaseapp.com",
+
+databaseURL: "https://app-sekolah-default-rtdb.firebaseio.com",
+
+projectId: "app-sekolah",
+
+storageBucket: "app-sekolah.appspot.com",
+
+messagingSenderId: "123456789",
+
+appId: "1:123:web:abc"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+/* SHOW SCREEN */
+function show(id){
+
+document.querySelectorAll('.screen')
+.forEach(s=>s.classList.remove('active'));
+
+document.getElementById(id)
+.classList.add('active');
+
+}
+
+/* LOGIN */
+function login(){
+
+let u=document.getElementById('user').value.toLowerCase();
+
+let p=document.getElementById('pass').value;
+
+let t=document.getElementById('type').value;
+
+/* PELAWAT */
+if(t==="pelawat" && p==="pelawat"){
+
+show('menuScreen');
+
+}
+
+/* PENGETUA */
+if(t==="pengetua"){
+
+let list=["rizq","ehamad","alif"];
+
+if(list.includes(u) && p==="pengetua"){
+
+/* AUTO ADMIN */
+show('adminScreen');
+
+loadOrders();
+
+loadVisitors();
+
+}else{
+
+alert("Login salah");
+
+}
+
+}
+
+}
+
+/* LOGOUT */
+function logout(){
+
+show('loginScreen');
+
+}
+
+/* VISITOR */
+function submitVisitor(){
+
+let name=document.getElementById("visitorName").value;
+
+let reason=document.getElementById("visitorReason").value;
+
+let time=document.getElementById("visitorTime").value;
+
+let note=document.getElementById("visitorNote").value;
+
+db.ref("visitors").push({
+
+name:name,
+reason:reason,
+time:time,
+note:note
+
+});
+
+document.getElementById("visitorResult").innerHTML =
+"✅ Pelawat berjaya didaftarkan";
+
+}
+
+/* LOAD VISITOR */
+function loadVisitors(){
+
+db.ref("visitors").on("value",snapshot=>{
+
+let html="";
+
+snapshot.forEach(data=>{
+
+let v=data.val();
+
+html += `
+<p>
+👤 ${v.name}<br>
+📌 ${v.reason}<br>
+🕒 ${v.time}
+</p>
+<hr>
+`;
+
+});
+
+document.getElementById("visitorList").innerHTML = html;
+
+});
+
+}
+
+/* ORDER */
+function order(food){
+
+let time=new Date().toLocaleTimeString();
+
+db.ref("orders").push({
+
+food:food,
+time:time
+
+});
+
+document.getElementById("orderResult").innerHTML =
+"✅ Order " + food + " berjaya";
+
+}
+
+/* LOAD ORDER */
+function loadOrders(){
+
+db.ref("orders").on("value",snapshot=>{
+
+let html="";
+
+snapshot.forEach(data=>{
+
+let o=data.val();
+
+html += `
+<p>
+🍔 ${o.food}<br>
+🕒 ${o.time}
+</p>
+<hr>
+`;
+
+});
+
+document.getElementById("orderList").innerHTML = html;
+
+});
+
+}
+
+/* AI CHATGPT */
+async function ai(){
+
+let q=document.getElementById("q").value;
+
+document.getElementById("ans").innerHTML =
+"🤖 Sedang berfikir...";
+
+try{
+
+const response = await axios.post(
+
+"https://api.openai.com/v1/chat/completions",
+
+{
+model:"gpt-4o-mini",
+
+messages:[
+{
+role:"system",
+content:"Anda ialah AI sekolah SMKAHMY"
+},
+{
+role:"user",
+content:q
+}
+]
+
+},
+
+{
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer API_OPENAI"
+}
+}
+
+);
+
+let reply =
+response.data.choices[0].message.content;
+
+document.getElementById("ans").innerHTML =
+reply;
+
+}catch(err){
+
+document.getElementById("ans").innerHTML =
+"❌ Error AI";
+
+}
+
+}
+
+/* UPLOAD */
+function preview(e){
+
+let i=document.getElementById("img");
+
+i.src=URL.createObjectURL(e.target.files[0]);
+
+i.style.display="block";
+
+}
+
+</script>
+
+</body>
+</html>
